@@ -1,9 +1,11 @@
 plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.1'
     id 'java'
 }
 
 group 'org.ekosutrisno'
 version '1.0-SNAPSHOT'
+sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -19,6 +21,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 }
 
-test {
-    useJUnitPlatform()
+shadowJar {
+    configurations = [project.configurations.compileClasspath]
 }
+
