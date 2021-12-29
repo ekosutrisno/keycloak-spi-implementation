@@ -13,6 +13,7 @@ import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.storage.UserStorageProviderFactory;
 
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.persistence.SharedCacheMode;
 import javax.persistence.ValidationMode;
 import javax.persistence.spi.ClassTransformer;
@@ -49,7 +50,7 @@ public class ErajayaKeycloakStorageProviderFactory implements UserStorageProvide
                 .property().name(DB_CONNECTION_NAME_KEY)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Connection Name")
-                .defaultValue("")
+                .defaultValue("erajaya")
                 .helpText("Name of the connection, can be chosen individually. Enables connection sharing between providers if the same name is provided. Overrides currently saved connection properties.")
                 .add()
 
@@ -65,31 +66,31 @@ public class ErajayaKeycloakStorageProviderFactory implements UserStorageProvide
                 .property().name(DB_DATABASE_KEY)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Database Name")
+                .defaultValue("users")
                 .add()
 
                 // DB Username
                 .property().name(DB_USERNAME_KEY)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Database Username")
-                .defaultValue("user")
+                .defaultValue("postgres")
                 .add()
 
                 // DB Password
                 .property().name(DB_PASSWORD_KEY)
                 .type(ProviderConfigProperty.PASSWORD)
                 .label("Database Password")
-                .defaultValue("password")
+                .defaultValue("root")
                 .add()
 
                 // DB Port
                 .property().name(DB_PORT_KEY)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Database Port")
-                .defaultValue("3306")
+                .defaultValue("5432")
                 .add()
                 .build();
     }
-
 
     @Override
     public String getId() {
@@ -110,7 +111,6 @@ public class ErajayaKeycloakStorageProviderFactory implements UserStorageProvide
         if (entityManagerFactory == null) {
             MultivaluedHashMap<String, String> config = model.getConfig();
             properties.put("hibernate.connection.driver_class", "org.postgresql.Driver");
-//            properties.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
             properties.put("hibernate.connection.url",
                     String.format("jdbc:postgresql://%s:%s/%s",
                             config.getFirst(DB_HOST_KEY),
@@ -125,7 +125,9 @@ public class ErajayaKeycloakStorageProviderFactory implements UserStorageProvide
 
             System.out.println(properties.entrySet());
 
-            entityManagerFactory = new HibernatePersistenceProvider().createContainerEntityManagerFactory(getPersistenceUnitInfo(), properties);
+            entityManagerFactory = new HibernatePersistenceProvider()
+                    .createContainerEntityManagerFactory(getPersistenceUnitInfo(), properties);
+
             entityManagerFactories.put(dbConnectionName, entityManagerFactory);
         }
         UserRepository userRepository = new UserRepository(entityManagerFactory.createEntityManager());
