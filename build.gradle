@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+}
+
+group 'org.ekosutrisno'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'org.keycloak', name: 'keycloak-core', version: '15.0.2'
+    implementation group: 'org.keycloak', name: 'keycloak-services', version: '15.0.2'
+    implementation group: 'org.keycloak', name: 'keycloak-server-spi', version: '15.0.2'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.1'
+    implementation group: 'org.hibernate', name: 'hibernate-gradle-plugin', version: '5.4.10.Final'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+}
+
+test {
+    useJUnitPlatform()
+}
