@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'java-library'
 }
 
 group 'org.ekosutrisno'
@@ -9,16 +10,27 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    bundleLib
+}
+
 dependencies {
     implementation group: 'org.keycloak', name: 'keycloak-core', version: '15.0.2'
     implementation group: 'org.keycloak', name: 'keycloak-services', version: '15.0.2'
     implementation group: 'org.keycloak', name: 'keycloak-server-spi', version: '15.0.2'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.1'
-    implementation group: 'org.hibernate', name: 'hibernate-gradle-plugin', version: '5.4.10.Final'
+    bundleLib group: 'org.postgresql', name: 'postgresql', version: '42.3.1'
+    bundleLib group: 'org.hibernate', name: 'hibernate-core', version: '5.4.10.Final'
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-}
 
+    configurations.compile.extendsFrom(configurations.bundleLib)
+}
+jar {
+    from {
+        configurations.bundleLib.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
 test {
     useJUnitPlatform()
 }

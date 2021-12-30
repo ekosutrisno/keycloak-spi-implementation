@@ -16,7 +16,6 @@ import org.keycloak.storage.user.UserLookupProvider;
 import org.keycloak.storage.user.UserQueryProvider;
 import org.keycloak.storage.user.UserRegistrationProvider;
 
-import java.sql.Connection;
 import java.util.*;
 import java.util.stream.Collectors;
 
