@@ -70,11 +70,15 @@ public class ErajayaKeycloakStorageProvider implements UserStorageProvider,
     @Override
     public boolean updateCredential(RealmModel realm, UserModel userModel, CredentialInput input) {
         if (!supportsCredentialType(input.getType()) || !(input instanceof UserCredentialModel)) return false;
-        User user = new User();
-        user.setUsername(userModel.getUsername());
-        user.setPassword(input.getChallengeResponse());
-        userRepository.updateUser(user);
-        return true;
+
+        Optional<User> user = userRepository.getUserByUsername(userModel.getUsername());
+        if (user.isPresent()) {
+            user.get().setPassword(input.getChallengeResponse());
+            userRepository.updateUser(user.get());
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -216,12 +220,10 @@ public class ErajayaKeycloakStorageProvider implements UserStorageProvider,
         return true;
     }
 
+    /* Modification to get user Password */
     public String getPassword(UserModel user) {
-        String password = null;
-        if (user instanceof UserRepresentationService) {
-            password = ((UserRepresentationService) user).getPassword();
-        }
-        return password;
+        Optional<User> optionalUser = userRepository.getUserByUsername(user.getUsername());
+        return optionalUser.map(User::getPassword).orElse(null);
     }
 
 }
