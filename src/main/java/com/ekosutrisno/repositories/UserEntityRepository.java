@@ -7,7 +7,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * @author Eko Sutrisno
@@ -49,7 +48,7 @@ public class UserEntityRepository {
     }
 
     public UserEntity getUserById(String id) {
-        return entityManager.find(UserEntity.class, UUID.fromString(id));
+        return entityManager.find(UserEntity.class, Long.parseLong(id));
     }
 
     public UserEntity createUser(UserEntity user) {
