@@ -1,56 +1,58 @@
 package com.ekosutrisno.repositories;
 
-import com.ekosutrisno.models.User;
+import com.ekosutrisno.models.UserEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Eko Sutrisno
  * Selasa, 28/12/2021 11.42
  */
-public class UserRepository {
+public class UserEntityRepository {
     private final EntityManager entityManager;
 
-    public UserRepository(EntityManager entityManager) {
+    public UserEntityRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
-    public List<User> findAll() {
+    public List<UserEntity> findAll() {
         return findAll(null, null);
     }
 
-    public List<User> findAll(int start, int max) {
+    public List<UserEntity> findAll(int start, int max) {
         return findAll((Integer) start, (Integer) max);
     }
 
-    public Optional<User> getUserByUsername(String username) {
-        TypedQuery<User> query = entityManager.createNamedQuery("getUserByUsername", User.class);
+    public Optional<UserEntity> getUserByUsername(String username) {
+        TypedQuery<UserEntity> query = entityManager.createNamedQuery("getUserEntityByUsername", UserEntity.class);
         query.setParameter("username", username);
         return query.getResultList().stream().findFirst();
     }
 
-    public Optional<User> getUserByEmail(String email) {
-        TypedQuery<User> query = entityManager.createNamedQuery("getUserByEmail", User.class);
+    public Optional<UserEntity> getUserByEmail(String email) {
+        TypedQuery<UserEntity> query = entityManager.createNamedQuery("getUserEntityByEmail", UserEntity.class);
         query.setParameter("email", email);
         return query.getResultList().stream().findFirst();
     }
 
-    public List<User> searchForUserByUsernameOrEmail(String searchString) {
+    public List<UserEntity> searchForUserByUsernameOrEmail(String searchString) {
         return searchForUserByUsernameOrEmail(searchString, null, null);
     }
 
-    public List<User> searchForUserByUsernameOrEmail(String searchString, int start, int max) {
+    public List<UserEntity> searchForUserByUsernameOrEmail(String searchString, int start, int max) {
         return searchForUserByUsernameOrEmail(searchString, (Integer) start, (Integer) max);
     }
 
-    public User getUserById(String id) {
-        return entityManager.find(User.class, UUID.fromString(id));
+    public UserEntity getUserById(String id) {
+        return entityManager.find(UserEntity.class, UUID.fromString(id));
     }
 
-    public User createUser(User user) {
+    public UserEntity createUser(UserEntity user) {
         EntityTransaction transaction = entityManager.getTransaction();
 
         transaction.begin();
@@ -60,7 +62,7 @@ public class UserRepository {
         return user;
     }
 
-    public void deleteUser(User user) {
+    public void deleteUser(UserEntity user) {
         EntityTransaction transaction = entityManager.getTransaction();
 
         transaction.begin();
@@ -72,7 +74,7 @@ public class UserRepository {
         entityManager.close();
     }
 
-    public User updateUser(User userEntity) {
+    public UserEntity updateUser(UserEntity userEntity) {
         EntityTransaction transaction = entityManager.getTransaction();
 
         transaction.begin();
@@ -83,13 +85,13 @@ public class UserRepository {
     }
 
     public int size() {
-        return entityManager.createNamedQuery("getUserCount", Integer.class).getSingleResult();
+        return entityManager.createNamedQuery("getUserEntityCount", Integer.class).getSingleResult();
     }
 
 
     /* This findAll For Local Private Implementation Class */
-    private List<User> findAll(Integer start, Integer max) {
-        TypedQuery<User> query = entityManager.createNamedQuery("searchForUser", User.class);
+    private List<UserEntity> findAll(Integer start, Integer max) {
+        TypedQuery<UserEntity> query = entityManager.createNamedQuery("searchForUserEntity", UserEntity.class);
 
         if (start != null)
             query.setFirstResult(start);
@@ -102,8 +104,8 @@ public class UserRepository {
     }
 
     /* This searchForUserByUsernameOrEmail For Local Private Implementation Class */
-    private List<User> searchForUserByUsernameOrEmail(String searchString, Integer start, Integer max) {
-        TypedQuery<User> query = entityManager.createNamedQuery("searchForUser", User.class);
+    private List<UserEntity> searchForUserByUsernameOrEmail(String searchString, Integer start, Integer max) {
+        TypedQuery<UserEntity> query = entityManager.createNamedQuery("searchForUserEntity", UserEntity.class);
         query.setParameter("search", "%" + searchString + "%");
 
         if (start != null)

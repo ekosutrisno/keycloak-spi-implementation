@@ -1,8 +1,8 @@
 package com.ekosutrisno;
 
-import com.ekosutrisno.models.User;
-import com.ekosutrisno.repositories.UserRepository;
-import com.ekosutrisno.services.UserRepresentationService;
+import com.ekosutrisno.models.UserEntity;
+import com.ekosutrisno.repositories.UserEntityRepository;
+import com.ekosutrisno.services.UserEntityRepresentationService;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputUpdater;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * @author Eko Sutrisno
  * Selasa, 28/12/2021 11.39
  */
-public class ErajayaKeycloakStorageProvider implements UserStorageProvider,
+public class DepKeycloakStorageProvider implements UserStorageProvider,
         UserLookupProvider,
         UserRegistrationProvider,
         UserQueryProvider,
@@ -31,11 +31,11 @@ public class ErajayaKeycloakStorageProvider implements UserStorageProvider,
         CredentialInputValidator {
 
 
-    private final UserRepository userRepository;
+    private final UserEntityRepository userRepository;
     KeycloakSession keycloakSession;
     ComponentModel componentModel;
 
-    public ErajayaKeycloakStorageProvider(UserRepository userRepository, KeycloakSession keycloakSession, ComponentModel componentModel) {
+    public DepKeycloakStorageProvider(UserEntityRepository userRepository, KeycloakSession keycloakSession, ComponentModel componentModel) {
         this.userRepository = userRepository;
         this.keycloakSession = keycloakSession;
         this.componentModel = componentModel;
@@ -71,7 +71,7 @@ public class ErajayaKeycloakStorageProvider implements UserStorageProvider,
     public boolean updateCredential(RealmModel realm, UserModel userModel, CredentialInput input) {
         if (!supportsCredentialType(input.getType()) || !(input instanceof UserCredentialModel)) return false;
 
-        Optional<User> user = userRepository.getUserByUsername(userModel.getUsername());
+        Optional<UserEntity> user = userRepository.getUserByUsername(userModel.getUsername());
         if (user.isPresent()) {
             user.get().setPassword(input.getChallengeResponse());
             userRepository.updateUser(user.get());
@@ -98,18 +98,18 @@ public class ErajayaKeycloakStorageProvider implements UserStorageProvider,
         }
     }
 
-    public UserRepresentationService getUserRepresentation(UserModel user) {
-        UserRepresentationService userRepresentation;
+    public UserEntityRepresentationService getUserRepresentation(UserModel user) {
+        UserEntityRepresentationService userRepresentation;
         if (user instanceof CachedUserModel) {
-            userRepresentation = (UserRepresentationService) ((CachedUserModel) user).getDelegateForUpdate();
+            userRepresentation = (UserEntityRepresentationService) ((CachedUserModel) user).getDelegateForUpdate();
         } else {
-            userRepresentation = (UserRepresentationService) user;
+            userRepresentation = (UserEntityRepresentationService) user;
         }
         return userRepresentation;
     }
 
-    public UserRepresentationService getUserRepresentation(User user, RealmModel realm) {
-        return new UserRepresentationService(keycloakSession, realm, componentModel, user, userRepository);
+    public UserEntityRepresentationService getUserRepresentation(UserEntity user, RealmModel realm) {
+        return new UserEntityRepresentationService(keycloakSession, realm, componentModel, user, userRepository);
     }
 
     @Override
@@ -121,7 +121,7 @@ public class ErajayaKeycloakStorageProvider implements UserStorageProvider,
     public List<UserModel> getUsers(RealmModel realm) {
         return userRepository.findAll()
                 .stream()
-                .map(user -> new UserRepresentationService(keycloakSession, realm, componentModel, user, userRepository))
+                .map(user -> new UserEntityRepresentationService(keycloakSession, realm, componentModel, user, userRepository))
                 .collect(Collectors.toList());
     }
 
@@ -129,7 +129,7 @@ public class ErajayaKeycloakStorageProvider implements UserStorageProvider,
     public List<UserModel> getUsers(RealmModel realm, int firstResult, int maxResults) {
         return userRepository.findAll(firstResult, maxResults)
                 .stream()
-                .map(user -> new UserRepresentationService(keycloakSession, realm, componentModel, user, userRepository))
+                .map(user -> new UserEntityRepresentationService(keycloakSession, realm, componentModel, user, userRepository))
                 .collect(Collectors.toList());
     }
 
@@ -137,7 +137,7 @@ public class ErajayaKeycloakStorageProvider implements UserStorageProvider,
     public List<UserModel> searchForUser(String search, RealmModel realm) {
         return userRepository.searchForUserByUsernameOrEmail(search)
                 .stream()
-                .map(user -> new UserRepresentationService(keycloakSession, realm, componentModel, user, userRepository))
+                .map(user -> new UserEntityRepresentationService(keycloakSession, realm, componentModel, user, userRepository))
                 .collect(Collectors.toList());
     }
 
@@ -145,7 +145,7 @@ public class ErajayaKeycloakStorageProvider implements UserStorageProvider,
     public List<UserModel> searchForUser(String search, RealmModel realm, int firstResult, int maxResults) {
         return userRepository.searchForUserByUsernameOrEmail(search, firstResult, maxResults)
                 .stream()
-                .map(user -> new UserRepresentationService(keycloakSession, realm, componentModel, user, userRepository))
+                .map(user -> new UserEntityRepresentationService(keycloakSession, realm, componentModel, user, userRepository))
                 .collect(Collectors.toList());
     }
 
@@ -160,7 +160,7 @@ public class ErajayaKeycloakStorageProvider implements UserStorageProvider,
                                          int maxResults) {
         return userRepository.findAll(firstResult, maxResults)
                 .stream()
-                .map(user -> new UserRepresentationService(keycloakSession, realm, componentModel, user, userRepository))
+                .map(user -> new UserEntityRepresentationService(keycloakSession, realm, componentModel, user, userRepository))
                 .collect(Collectors.toList());
     }
 
@@ -186,33 +186,33 @@ public class ErajayaKeycloakStorageProvider implements UserStorageProvider,
     public UserModel getUserById(String keycloakId, RealmModel realm) {
         // keycloakId := keycloak internal id; needs to be mapped to external id
         String id = StorageId.externalId(keycloakId);
-        return new UserRepresentationService(keycloakSession, realm, componentModel, userRepository.getUserById(id), userRepository);
+        return new UserEntityRepresentationService(keycloakSession, realm, componentModel, userRepository.getUserById(id), userRepository);
     }
 
     @Override
     public UserModel getUserByUsername(String username, RealmModel realm) {
-        Optional<User> optionalUser = userRepository.getUserByUsername(username);
+        Optional<UserEntity> optionalUser = userRepository.getUserByUsername(username);
         return optionalUser.map(user -> getUserRepresentation(user, realm)).orElse(null);
     }
 
     @Override
     public UserModel getUserByEmail(String email, RealmModel realm) {
-        Optional<User> optionalUser = userRepository.getUserByEmail(email);
+        Optional<UserEntity> optionalUser = userRepository.getUserByEmail(email);
         return optionalUser.map(user -> getUserRepresentation(user, realm)).orElse(null);
     }
 
     @Override
     public UserModel addUser(RealmModel realm, String username) {
-        User user = new User();
-        user.setUsername(username);
+        UserEntity user = new UserEntity();
+        user.setName(username);
         user = userRepository.createUser(user);
 
-        return new UserRepresentationService(keycloakSession, realm, componentModel, user, userRepository);
+        return new UserEntityRepresentationService(keycloakSession, realm, componentModel, user, userRepository);
     }
 
     @Override
     public boolean removeUser(RealmModel realm, UserModel user) {
-        User userEntity = userRepository.getUserById(StorageId.externalId(user.getId()));
+        UserEntity userEntity = userRepository.getUserById(StorageId.externalId(user.getId()));
         if (userEntity == null) {
             return false;
         }
@@ -222,8 +222,8 @@ public class ErajayaKeycloakStorageProvider implements UserStorageProvider,
 
     /* Modification to get user Password */
     public String getPassword(UserModel user) {
-        Optional<User> optionalUser = userRepository.getUserByUsername(user.getUsername());
-        return optionalUser.map(User::getPassword).orElse(null);
+        Optional<UserEntity> optionalUser = userRepository.getUserByUsername(user.getUsername());
+        return optionalUser.map(UserEntity::getPassword).orElse(null);
     }
 
 }

@@ -1,7 +1,7 @@
 package com.ekosutrisno.services;
 
-import com.ekosutrisno.models.User;
-import com.ekosutrisno.repositories.UserRepository;
+import com.ekosutrisno.models.UserEntity;
+import com.ekosutrisno.repositories.UserEntityRepository;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.KeycloakSession;
@@ -17,15 +17,15 @@ import java.util.Map;
  * @author Eko Sutrisno
  * Selasa, 28/12/2021 11.45
  */
-public class UserRepresentationService extends AbstractUserAdapterFederatedStorage {
-    private User userEntity;
-    private final UserRepository userRepository;
+public class UserEntityRepresentationService extends AbstractUserAdapterFederatedStorage {
+    private UserEntity userEntity;
+    private final UserEntityRepository userRepository;
 
-    public UserRepresentationService(KeycloakSession session,
-                                     RealmModel realm,
-                                     ComponentModel storageProviderModel,
-                                     User userEntity,
-                                     UserRepository userRepository) {
+    public UserEntityRepresentationService(KeycloakSession session,
+                                           RealmModel realm,
+                                           ComponentModel storageProviderModel,
+                                           UserEntity userEntity,
+                                           UserEntityRepository userRepository) {
         super(session, realm, storageProviderModel);
         this.userEntity = userEntity;
         this.userRepository = userRepository;
@@ -34,12 +34,12 @@ public class UserRepresentationService extends AbstractUserAdapterFederatedStora
 
     @Override
     public String getUsername() {
-        return userEntity.getUsername();
+        return userEntity.getName();
     }
 
     @Override
     public void setUsername(String username) {
-        userEntity.setUsername(username);
+        userEntity.setName(username);
         userRepository.updateUser(userEntity);
     }
 
@@ -56,17 +56,17 @@ public class UserRepresentationService extends AbstractUserAdapterFederatedStora
 
     @Override
     public void setSingleAttribute(String name, String value) {
-        if (name.equals("phone")) {
-            userEntity.setPhone(value);
+        if (name.equals("isActive")) {
+            userEntity.setIsActive(Byte.valueOf(value));
         } else {
-            super.setSingleAttribute(name, value);
+            super.setSingleAttribute(name, value.toString());
         }
     }
 
     @Override
     public void removeAttribute(String name) {
-        if (name.equals("phone")) {
-            userEntity.setPhone(null);
+        if (name.equals("isActive")) {
+            userEntity.setIsActive((byte) 0);
         } else {
             super.removeAttribute(name);
         }
@@ -75,8 +75,8 @@ public class UserRepresentationService extends AbstractUserAdapterFederatedStora
 
     @Override
     public void setAttribute(String name, List<String> values) {
-        if (name.equals("phone")) {
-            userEntity.setPhone(values.get(0));
+        if (name.equals("isActive")) {
+            userEntity.setIsActive(Byte.valueOf(values.get(0)));
         } else {
             super.setAttribute(name, values);
         }
@@ -85,8 +85,8 @@ public class UserRepresentationService extends AbstractUserAdapterFederatedStora
 
     @Override
     public String getFirstAttribute(String name) {
-        if (name.equals("phone")) {
-            return userEntity.getPhone();
+        if (name.equals("isActive")) {
+            return userEntity.getIsActive().toString();
         } else {
             return super.getFirstAttribute(name);
         }
@@ -97,16 +97,16 @@ public class UserRepresentationService extends AbstractUserAdapterFederatedStora
         Map<String, List<String>> attrs = super.getAttributes();
         MultivaluedHashMap<String, String> all = new MultivaluedHashMap<>();
         all.putAll(attrs);
-        all.add("phone", userEntity.getPhone());
+        all.add("isActive", userEntity.getIsActive().toString());
         return all;
     }
 
     @Override
     public List<String> getAttribute(String name) {
-        if (name.equals("phone")) {
-            List<String> phone = new LinkedList<>();
-            phone.add(userEntity.getPhone());
-            return phone;
+        if (name.equals("isActive")) {
+            List<String> data = new LinkedList<>();
+            data.add(userEntity.getIsActive().toString());
+            return data;
         } else {
             return super.getAttribute(name);
         }

@@ -1,7 +1,7 @@
 package com.ekosutrisno;
 
-import com.ekosutrisno.models.User;
-import com.ekosutrisno.repositories.UserRepository;
+import com.ekosutrisno.models.UserEntity;
+import com.ekosutrisno.repositories.UserEntityRepository;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.component.ComponentModel;
@@ -28,9 +28,9 @@ import java.util.*;
  * @author Eko Sutrisno
  * Selasa, 28/12/2021 11.40
  */
-public class ErajayaKeycloakStorageProviderFactory implements UserStorageProviderFactory<ErajayaKeycloakStorageProvider> {
+public class DepKeycloakStorageProviderFactory implements UserStorageProviderFactory<DepKeycloakStorageProvider> {
     public static final int PORT_LIMIT = 65535;
-    public static final String PROVIDER_NAME_ID = "erajaya-spi-postgres-custom-storage";
+    public static final String PROVIDER_NAME_ID = "dep-spi-postgres-custom-storage";
     Map<String, String> properties;
     Map<String, EntityManagerFactory> entityManagerFactories = new HashMap<>();
 
@@ -103,7 +103,7 @@ public class ErajayaKeycloakStorageProviderFactory implements UserStorageProvide
     }
 
     @Override
-    public ErajayaKeycloakStorageProvider create(KeycloakSession session, ComponentModel model) {
+    public DepKeycloakStorageProvider create(KeycloakSession session, ComponentModel model) {
         properties = new HashMap<>();
         String dbConnectionName = model.getConfig().getFirst("db:connectionName");
         EntityManagerFactory entityManagerFactory = entityManagerFactories.get(dbConnectionName);
@@ -126,8 +126,8 @@ public class ErajayaKeycloakStorageProviderFactory implements UserStorageProvide
             entityManagerFactory = new HibernatePersistenceProvider().createContainerEntityManagerFactory(getPersistenceUnitInfo(), properties);
             entityManagerFactories.put(dbConnectionName, entityManagerFactory);
         }
-        UserRepository userRepository = new UserRepository(entityManagerFactory.createEntityManager());
-        return new ErajayaKeycloakStorageProvider(userRepository, session, model);
+        UserEntityRepository userRepository = new UserEntityRepository(entityManagerFactory.createEntityManager());
+        return new DepKeycloakStorageProvider(userRepository, session, model);
     }
 
     @Override
@@ -211,7 +211,7 @@ public class ErajayaKeycloakStorageProviderFactory implements UserStorageProvide
             @Override
             public List<String> getManagedClassNames() {
                 List<String> managedClasses = new LinkedList<>();
-                managedClasses.add(User.class.getName());
+                managedClasses.add(UserEntity.class.getName());
                 return managedClasses;
             }
 
