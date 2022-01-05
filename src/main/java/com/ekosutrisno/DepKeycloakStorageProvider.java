@@ -15,6 +15,8 @@ import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.user.UserLookupProvider;
 import org.keycloak.storage.user.UserQueryProvider;
 import org.keycloak.storage.user.UserRegistrationProvider;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,6 +36,8 @@ public class DepKeycloakStorageProvider implements UserStorageProvider,
     private final UserEntityRepository userRepository;
     KeycloakSession keycloakSession;
     ComponentModel componentModel;
+
+    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public DepKeycloakStorageProvider(UserEntityRepository userRepository, KeycloakSession keycloakSession, ComponentModel componentModel) {
         this.userRepository = userRepository;
@@ -56,7 +60,7 @@ public class DepKeycloakStorageProvider implements UserStorageProvider,
         if (!(credentialInput instanceof UserCredentialModel)) return false;
         if (supportsCredentialType(credentialInput.getType())) {
             String password = getPassword(user);
-            return password != null && password.equals(credentialInput.getChallengeResponse());
+            return password != null && passwordEncoder.matches(credentialInput.getChallengeResponse(), password);
         } else {
             return false; // invalid cred type
         }
@@ -73,12 +77,11 @@ public class DepKeycloakStorageProvider implements UserStorageProvider,
 
         Optional<UserEntity> user = userRepository.getUserByUsername(userModel.getUsername());
         if (user.isPresent()) {
-            user.get().setPassword(input.getChallengeResponse());
+            user.get().setPassword(passwordEncoder.encode(input.getChallengeResponse()));
             userRepository.updateUser(user.get());
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override

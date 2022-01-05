@@ -8,17 +8,18 @@ import java.util.Date;
  * Selasa, 04/01/2022 09.43
  */
 @NamedQueries({
-        @NamedQuery(name="getUserEntityByUsername", query="select u from UserEntity u where u.name = :username"),
-        @NamedQuery(name="getUserEntityByEmail", query="select u from UserEntity u where u.email = :email"),
-        @NamedQuery(name="getUserEntityCount", query="select count(u) from UserEntity u"),
-        @NamedQuery(name="getAllUserEntities", query="select u from UserEntity u"),
-        @NamedQuery(name="searchForUserEntity", query="select u from UserEntity u where " +
+        @NamedQuery(name = "getUserEntityByUsername", query = "select u from UserEntity u where u.name = :username"),
+        @NamedQuery(name = "getUserEntityByEmail", query = "select u from UserEntity u where u.email = :email"),
+        @NamedQuery(name = "getUserEntityCount", query = "select count(u) from UserEntity u"),
+        @NamedQuery(name = "getAllUserEntities", query = "select u from UserEntity u"),
+        @NamedQuery(name = "searchForUserEntity", query = "select u from UserEntity u where " +
                 "( lower(u.name) like :search or u.email like :search ) order by u.name"),
 })
 @Entity
 @Table(name = UserEntity.TABLE_NAME)
 public class UserEntity {
     static final String TABLE_NAME = "users";
+    private static final String DEFAULT_PASSWORD = "$2a$12$/Tk40V/uKBHL9G0MuYpF/ueKG73vp10CPPlSBc8pMR8zWVd382QxW"; // (123456)
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,14 +29,14 @@ public class UserEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "use_ldap", nullable = false)
-    private Byte useLdap;
+    private Byte useLdap = 0;
 
     @Column(name = "is_active", nullable = false)
-    private Byte isActive;
+    private Byte isActive = 1;
 
     @Column(name = "email_verified_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -203,4 +204,18 @@ public class UserEntity {
     public void setUpdatedBy(Long updatedBy) {
         this.updatedBy = updatedBy;
     }
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = new Date();
+        updatedAt = createdAt;
+        password = DEFAULT_PASSWORD;
+
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = new Date();
+    }
+
 }
