@@ -1,1 +1,2 @@
-com.ekosutrisno.DepKeycloakStorageProviderFactory
+com.ekosutrisno.DepKeycloakStorageProviderFactoryPgSql
+com.ekosutrisno.DepKeycloakStorageProviderFactoryMySql

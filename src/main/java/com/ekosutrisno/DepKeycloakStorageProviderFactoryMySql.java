@@ -28,9 +28,9 @@ import java.util.*;
  * @author Eko Sutrisno
  * Selasa, 28/12/2021 11.40
  */
-public class DepKeycloakStorageProviderFactory implements UserStorageProviderFactory<DepKeycloakStorageProvider> {
+public class DepKeycloakStorageProviderFactoryMySql implements UserStorageProviderFactory<DepKeycloakStorageProvider> {
     public static final int PORT_LIMIT = 65535;
-    public static final String PROVIDER_NAME_ID = "dep-spi-postgres-custom-storage";
+    public static final String PROVIDER_NAME_ID = "dep-spi-mysql-custom-storage";
     Map<String, String> properties;
     Map<String, EntityManagerFactory> entityManagerFactories = new HashMap<>();
 
@@ -49,7 +49,7 @@ public class DepKeycloakStorageProviderFactory implements UserStorageProviderFac
                 .property().name(DB_CONNECTION_NAME_KEY)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Connection Name")
-                .defaultValue("erajaya-spi-postgres-custom-storage")
+                .defaultValue("erajaya-spi-mysql-custom-storage")
                 .helpText("Name of the connection, can be chosen individually. Enables connection sharing between providers if the same name is provided. Overrides currently saved connection properties.")
                 .add()
 
@@ -73,7 +73,7 @@ public class DepKeycloakStorageProviderFactory implements UserStorageProviderFac
                 .property().name(DB_USERNAME_KEY)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Database Username")
-                .defaultValue("postgres")
+                .defaultValue("root")
                 .add()
 
                 // DB Password
@@ -87,7 +87,7 @@ public class DepKeycloakStorageProviderFactory implements UserStorageProviderFac
                 .property().name(DB_PORT_KEY)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Database Port")
-                .defaultValue("5432")
+                .defaultValue("3306")
                 .add()
                 .build();
     }
@@ -110,9 +110,9 @@ public class DepKeycloakStorageProviderFactory implements UserStorageProviderFac
 
         if (entityManagerFactory == null) {
             MultivaluedHashMap<String, String> config = model.getConfig();
-            properties.put("hibernate.connection.driver_class", "org.postgresql.Driver");
+            properties.put("hibernate.connection.driver_class", "com.mysql.cj.jdbc.Driver");
             properties.put("hibernate.connection.url",
-                    String.format("jdbc:postgresql://%s:%s/%s",
+                    String.format("jdbc:mysql://%s:%s/%s",
                             config.getFirst(DB_HOST_KEY),
                             config.getFirst(DB_PORT_KEY),
                             config.getFirst(DB_DATABASE_KEY)));
@@ -164,7 +164,7 @@ public class DepKeycloakStorageProviderFactory implements UserStorageProviderFac
         return new PersistenceUnitInfo() {
             @Override
             public String getPersistenceUnitName() {
-                return "dep_user_storage_postgresql";
+                return "dep_user_storage_mysql";
             }
 
             @Override
