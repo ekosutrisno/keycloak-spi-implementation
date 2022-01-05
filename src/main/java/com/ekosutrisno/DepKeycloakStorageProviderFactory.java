@@ -164,7 +164,7 @@ public class DepKeycloakStorageProviderFactory implements UserStorageProviderFac
         return new PersistenceUnitInfo() {
             @Override
             public String getPersistenceUnitName() {
-                return "erajaya_user_storage_postgresql";
+                return "dep_user_storage_postgresql";
             }
 
             @Override
