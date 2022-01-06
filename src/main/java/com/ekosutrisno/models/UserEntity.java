@@ -12,14 +12,13 @@ import java.util.Date;
         @NamedQuery(name = "getUserEntityByEmail", query = "select u from UserEntity u where u.email = :email"),
         @NamedQuery(name = "getUserEntityCount", query = "select count(u) from UserEntity u"),
         @NamedQuery(name = "getAllUserEntities", query = "select u from UserEntity u"),
-        @NamedQuery(name = "searchForUserEntity", query = "select u from UserEntity u where " +
-                "( lower(u.name) like :search or u.email like :search ) order by u.name"),
+        @NamedQuery(name = "searchForUserEntity", query = "select u from UserEntity u where ( lower(u.name) like :search or u.email like :search ) order by u.name"),
 })
 @Entity
 @Table(name = UserEntity.TABLE_NAME)
 public class UserEntity {
     static final String TABLE_NAME = "users";
-    private static final String DEFAULT_PASSWORD = "$2a$12$/Tk40V/uKBHL9G0MuYpF/ueKG73vp10CPPlSBc8pMR8zWVd382QxW"; // (123456)
+    private static final String DEFAULT_PASSWORD = "$2a$12$/Tk40V/uKBHL9G0MuYpF/ueKG73vp10CPPlSBc8pMR8zWVd382QxW"; // value = 123456
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -210,7 +209,6 @@ public class UserEntity {
         createdAt = new Date();
         updatedAt = createdAt;
         password = DEFAULT_PASSWORD;
-
     }
 
     @PreUpdate

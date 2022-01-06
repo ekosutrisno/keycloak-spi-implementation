@@ -37,7 +37,7 @@ public class DepKeycloakStorageProvider implements UserStorageProvider,
     KeycloakSession keycloakSession;
     ComponentModel componentModel;
 
-    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
     public DepKeycloakStorageProvider(UserEntityRepository userRepository, KeycloakSession keycloakSession, ComponentModel componentModel) {
         this.userRepository = userRepository;
